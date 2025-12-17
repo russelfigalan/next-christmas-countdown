@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Mountains_of_Christmas, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+const christmasFont = Mountains_of_Christmas({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-christmas",
+  display: "swap",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,12 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en" className={christmasFont.variable}>
+      <body>{children}</body>
     </html>
   );
 }
