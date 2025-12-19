@@ -1,8 +1,9 @@
-import Image from "next/image";
 import Snowfall from "./components/Snowfall";
 import Header from "./components/Header";
 import Countdown from "./components/Countdown";
 import Footer from "./components/Footer";
+
+export const runtime = "edge";
 
 export default function Home() {
   return (
