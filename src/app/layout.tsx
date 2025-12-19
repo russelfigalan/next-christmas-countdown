@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mountains_of_Christmas, Geist, Geist_Mono } from "next/font/google";
+import { Mountains_of_Christmas } from "next/font/google";
 import "./globals.css";
 
 const christmasFont = Mountains_of_Christmas({
@@ -7,16 +7,6 @@ const christmasFont = Mountains_of_Christmas({
   weight: ["400", "700"],
   variable: "--font-christmas",
   display: "swap",
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 const currentDate = new Date();

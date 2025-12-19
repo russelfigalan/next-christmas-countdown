@@ -4,10 +4,22 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
+// Move colors outside to prevent it being a dependency in useEffect
+const FIREWORK_COLORS = [
+  "#FF0000",
+  "#008000",
+  "#FFFFFF",
+  "#FFD700",
+  "#00BFFF",
+  "#FF69B4",
+  "#FF8C00",
+  "#ADFF2F",
+];
+
 interface FireworksProps {
   density?: number;
   autoLaunch?: boolean;
-  remainingTime?: any;
+  remainingTime: number; // Changed from any to number
 }
 
 interface Particle {
@@ -25,7 +37,7 @@ class Firework {
   particles: Particle[] = [];
 
   constructor(x: number, y: number, colors: string[]) {
-    const count = 150; // more particles for bigger fireworks
+    const count = 150;
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count;
       const speed = Math.random() * 6 + 2;
@@ -61,18 +73,6 @@ const Fireworks: React.FC<FireworksProps> = ({
   const fireworksRef = useRef<Firework[]>([]);
   const rafRef = useRef<number | null>(null);
 
-  // Expanded color palette for more vibrant fireworks
-  const colors = [
-    "#FF0000",
-    "#008000",
-    "#FFFFFF",
-    "#FFD700",
-    "#00BFFF",
-    "#FF69B4",
-    "#FF8C00",
-    "#ADFF2F",
-  ];
-
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -89,22 +89,21 @@ const Fireworks: React.FC<FireworksProps> = ({
 
     const animate = () => {
       if (!ctxRef.current || !canvasRef.current) return;
-      ctxRef.current.fillStyle = "#8B0000"; // Dark red background
-      ctxRef.current.fillRect(
-        0,
-        0,
-        canvasRef.current.width,
-        canvasRef.current.height
-      );
+
+      const ctx = ctxRef.current;
+      const cvs = canvasRef.current;
+
+      ctx.fillStyle = "#8B0000";
+      ctx.fillRect(0, 0, cvs.width, cvs.height);
 
       fireworksRef.current.forEach((firework, index) => {
         firework.update();
         firework.particles.forEach((p) => {
-          ctxRef.current!.beginPath();
-          ctxRef.current!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctxRef.current!.fillStyle = p.color;
-          ctxRef.current!.globalAlpha = p.alpha;
-          ctxRef.current!.fill();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
+          ctx.fill();
         });
         firework.particles = firework.particles.filter((p) => p.alpha > 0);
         if (firework.particles.length === 0) {
@@ -112,51 +111,25 @@ const Fireworks: React.FC<FireworksProps> = ({
         }
       });
 
-      ctxRef.current.globalAlpha = 1;
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
 
-      ctxRef.current.fillStyle = "white";
-      ctxRef.current.textAlign = "center";
-
-      const responsiveMainFont = () => {
-        if (window.innerWidth >= 1024) {
-          return 128;
-        } else if (window.innerWidth >= 768) {
-          return 80;
-        } else {
-          return 40;
-        }
+      const getFontSize = (base: number) => {
+        if (window.innerWidth >= 1024) return base;
+        if (window.innerWidth >= 768) return base * 0.6;
+        return base * 0.3;
       };
 
-      const responsiveSubFont = () => {
-        if (window.innerWidth >= 1024) {
-          return 50;
-        } else if (window.innerWidth >= 768) {
-          return 30;
-        } else {
-          return 15;
-        }
-      };
+      ctx.font = `bold ${getFontSize(128)}px 'Mountains of Christmas', serif`;
+      ctx.fillText("Merry Christmas", cvs.width / 2, cvs.height / 2);
 
-      const responsiveTextLine = () => {
-        if (window.innerWidth >= 768) {
-          return 90;
-        } else {
-          return 40;
-        }
-      };
-
-      ctxRef.current.font = `bold ${responsiveMainFont()}px 'Mountains of Christmas', serif`;
-      ctxRef.current.fillText(
-        "Merry Christmas",
-        canvasRef.current.width / 2,
-        canvasRef.current.height / 2
-      );
-
-      ctxRef.current.font = `bold ${responsiveSubFont()}px 'Mountains of Christmas', serif`;
-      ctxRef.current.fillText(
+      ctx.font = `bold ${getFontSize(50)}px 'Mountains of Christmas', serif`;
+      const offset = window.innerWidth >= 768 ? 90 : 40;
+      ctx.fillText(
         '"Hope your christmas is merry, bright and full of love"',
-        canvasRef.current.width / 2,
-        canvasRef.current.height / 2 + responsiveTextLine()
+        cvs.width / 2,
+        cvs.height / 2 + offset
       );
 
       rafRef.current = requestAnimationFrame(animate);
@@ -164,22 +137,19 @@ const Fireworks: React.FC<FireworksProps> = ({
 
     animate();
 
+    let interval: NodeJS.Timeout;
     if (autoLaunch) {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         if (Math.random() < density) {
           const x = Math.random() * canvas.width;
           const y = Math.random() * canvas.height * 0.5;
-          fireworksRef.current.push(new Firework(x, y, colors));
+          fireworksRef.current.push(new Firework(x, y, FIREWORK_COLORS));
         }
-      }, 150); // more frequent launches
-      return () => {
-        clearInterval(interval);
-        if (rafRef.current) cancelAnimationFrame(rafRef.current);
-        window.removeEventListener("resize", resize);
-      };
+      }, 150);
     }
 
     return () => {
+      if (interval) clearInterval(interval);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
     };
@@ -189,19 +159,19 @@ const Fireworks: React.FC<FireworksProps> = ({
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    fireworksRef.current.push(new Firework(x, y, colors));
+    fireworksRef.current.push(new Firework(x, y, FIREWORK_COLORS));
   };
 
   useGSAP(() => {
     if (remainingTime <= 0) {
-      gsap.to("#fireworks", {
+      gsap.to("#fireworks-container", {
         opacity: 1,
         display: "block",
         duration: 0.5,
         onComplete: () => {
-          gsap.to("#fireworks", {
+          gsap.to("#fireworks-container", {
             opacity: 0,
-            display: "hidden",
+            display: "none",
             duration: 0.5,
             delay: 60,
           });
@@ -211,22 +181,17 @@ const Fireworks: React.FC<FireworksProps> = ({
   }, [remainingTime]);
 
   return (
-    <>
-      <div id="fireworks" className="w-full h-full fixed hidden opacity-0 z-40">
-        <canvas
-          ref={canvasRef}
-          onClick={handleClick}
-          aria-label="Christmas Fireworks canvas"
-          id="fireworks"
-          className="fixed top-0 left-0 w-full h-full"
-        />
-        ;
-        {/* <div className="absolute inset-0 flex flex-col justify-center-safe items-center-safe gap-5 font-christmas font-bold text-white text-shadow-[2px_2px_1px_#000000] z-50">
-        <h1 className="md:text-9xl">Merry Christmas</h1>
-        <p className="md:text-5xl">"Hope your christmas is merry, bright and full of love"</p>
-      </div> */}
-      </div>
-    </>
+    <div
+      id="fireworks-container"
+      className="w-full h-full fixed hidden opacity-0 z-40"
+    >
+      <canvas
+        ref={canvasRef}
+        onClick={handleClick}
+        aria-label="Christmas Fireworks canvas"
+        className="fixed top-0 left-0 w-full h-full"
+      />
+    </div>
   );
 };
 
