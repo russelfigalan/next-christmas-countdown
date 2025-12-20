@@ -2,5 +2,12 @@
   "name": "next-christmas-countdown",
   "pages_build_output_dir": ".vercel/output/static",
   "compatibility_date": "2025-01-01",
-  "compatibility_flags": ["nodejs_compat"]
+  "compatibility_flags": ["nodejs_compat"],
+  "name": "christmas-countdown-next",
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET", // This name must match exactly
+      "bucket_name": "next-inc-cache"
+    }
+  ]
 }
