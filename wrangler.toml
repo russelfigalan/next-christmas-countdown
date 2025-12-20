@@ -1,0 +1,9 @@
+
+name = "christmas-countdown"
+compatibility_date = "2025-12-19"
+pages_build_output_dir = ".vercel/output/static"
+
+# Route configuration
+[[routes]]
+pattern = "/*"
+custom_domain = false
