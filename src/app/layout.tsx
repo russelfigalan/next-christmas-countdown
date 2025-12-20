@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Mountains_of_Christmas } from "next/font/google";
+import { PageLoaderProvider } from "./components/PageLoaderProvider";
+import PageLoader from "./components/PageLoader";
 import "./globals.css";
 
 const christmasFont = Mountains_of_Christmas({
@@ -23,7 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={christmasFont.variable}>
-      <body>{children}</body>
+      <body>
+        <PageLoaderProvider>
+          <PageLoader />
+          {children}
+        </PageLoaderProvider>
+      </body>
     </html>
   );
 }
