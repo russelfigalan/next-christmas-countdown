@@ -8,8 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "pages:build": "npx @cloudflare/next-on-pages",
-    "pages:deploy": "npx wrangler pages deploy .vercel/output/static",
-    "deploy": "npm run pages:build && npm run pages:deploy"
+    "pages:deploy": "npx wrangler pages deploy .vercel/output/static --project-name=christmas-countdown",
+    "pages:watch": "npx @cloudflare/next-on-pages --watch",
+    "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
