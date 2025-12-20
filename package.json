@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "pages:build": "npx @cloudflare/next-on-pages",
-    "pages:deploy": "npx wrangler pages deploy .vercel/output/static --project-name=christmas-countdown",
+    "pages:deploy": "npx wrangler pages deploy .vercel/output/static --project-name=next-christmas-countdown",
     "pages:watch": "npx @cloudflare/next-on-pages --watch",
     "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat"
   },
